@@ -11,8 +11,11 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://about.remotevm.ir">
     <meta property="og:image" content="https://remotevm.ir/assets/og-image.jpg">
-    <title>RemoteVM - پلتفرم پیشرفته لایو استریم و تماس تصویری</title>
-    <link href="/fonts/vazirmatn.css" rel="stylesheet">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="لوگوی RemoteVM">
+    <title>RemoteVM - لایو استریم و تماس تصویری</title>
+    <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.0/dist/Vazirmatn-font-face.css" rel="stylesheet">
     <style>
         :root {
             --primary-color: #00e1ff;
@@ -63,7 +66,7 @@
         .background-effects {
             position: fixed;
             top: 0;
-            left: 0;
+            inset-inline-start: 0;
             width: 100%;
             height: 100%;
             z-index: 0;
@@ -93,7 +96,7 @@
         .scanline-overlay {
             position: absolute;
             top: 0;
-            left: 0;
+            inset-inline-start: 0;
             width: 100%;
             height: 100%;
             background: linear-gradient(transparent 50%, rgba(0, 0, 0, 0.15) 50%);
@@ -209,7 +212,7 @@
         .section-title::after {
             content: '';
             position: absolute;
-            right: 0;
+            inset-inline-end: 0;
             bottom: 0;
             width: 0;
             height: 3px;
@@ -228,21 +231,21 @@
 
         .section ul {
             list-style: none;
-            padding-right: 0;
+            padding-inline-start: 0;
         }
-
+        
         .section ul li {
             margin-bottom: 12px;
             position: relative;
-            padding-right: 30px;
+            padding-inline-start: 30px; /* فاصله مناسب از نقطه نشانگر */
             display: flex;
             align-items: center;
         }
-
+        
         .section ul li::before {
             content: '';
             position: absolute;
-            right: 0;
+            inset-inline-start: 0; /* نقطه در سمت راست (RTL) */
             top: 50%;
             transform: translateY(-50%);
             width: 10px;
@@ -301,7 +304,7 @@
         .card-title svg {
             width: 22px;
             height: 22px;
-            margin-left: 10px;
+            margin-inline-start: 10px;
             fill: var(--primary-color);
             transition: transform 0.3s ease;
         }
@@ -375,23 +378,33 @@
             content: attr(data-text);
             position: absolute;
             top: 0;
-            right: 0; /* Adjusted for RTL */
+            inset-inline-end: 0;
             width: 100%;
             height: 100%;
             background: var(--background-dark);
         }
         .glitch-text::before {
             color: var(--glitch-color-1);
-            text-shadow: 2px 0 var(--glitch-color-3), 0 0 10px rgba(var(--primary-color-rgb), 0.5); /* Cyan + Red split */
+            text-shadow: 2px 0 var(--glitch-color-3), 0 0 10px rgba(var(--primary-color-rgb), 0.5);
             animation: glitchShift1 1.5s infinite linear alternate, glitchClip1 2s infinite steps(1);
-            right: 2px; /* Adjusted for RTL */
+            inset-inline-end: 2px;
         }
         .glitch-text::after {
             color: var(--glitch-color-2);
-            text-shadow: -2px 0 var(--accent-color), 0 0 10px rgba(var(--secondary-color-rgb), 0.5); /* Pink + Green split */
+            text-shadow: -2px 0 var(--accent-color), 0 0 10px rgba(var(--secondary-color-rgb), 0.5);
             animation: glitchShift2 1.8s infinite linear alternate, glitchClip2 2.2s infinite steps(1);
-            right: -2px; /* Adjusted for RTL */
+            inset-inline-end: -2px;
         }
+        .custom-link {
+            color: #d22d90; /* رنگ دلخواه (مثال: نارنجی) */
+            text-decoration: none; /* حذف زیرخط پیش‌فرض لینک */
+        }
+        
+        .custom-link:hover {
+            color: #ff8c42; /* رنگ متفاوت در حالت hover (اختیاری) */
+            text-shadow: 0 0 5px #ff8c42; /* افکت سایه در حالت hover (اختیاری) */
+        }        
+        
         @keyframes glitchShake {
             0%, 100% { transform: translate(0, 0); }
             10% { transform: translate(1px, -1px); }
@@ -455,6 +468,14 @@
                 justify-content: center;
             }
         }
+
+        /* Accessibility: Reduce motion for users who prefer it */
+        @media (prefers-reduced-motion: reduce) {
+            .background-grid, .scanline-overlay, .logo-core, .glitch-text, .section, .content-container, .section-title::after, .section ul li::before, .cta-button {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -468,13 +489,13 @@
             <div class="logo-core">
                 <span>R</span>VM
             </div>
-            <h1 class="main-title" data-text="به RemoteVM خوش آمدید">RemoteVM</h1>
+            <h1 class="main-title" data-text="به RemoteVM خوش آمدید">به RemoteVM خوش آمدید</h1>
             <p class="subtitle">پلتفرم نهایی شما برای لایو استریم با کیفیت سینمایی و تماس‌های تصویری بدون مرز</p>
         </header>
 
         <main class="content-container">
-            <section class="section" id="about-platform">
-                <h2 class="section-title">درباره پلتفرم RemoteVM</h2>
+            <section class="section" id="about-platform" aria-labelledby="about-platform-title">
+                <h2 class="section-title" id="about-platform-title">درباره پلتفرم RemoteVM</h2>
                 <p>
                     در <span class="strong">RemoteVM</span>، ما آینده ارتباطات دیجیتال را بازتعریف می‌کنیم. با تمرکز بر ارائه <span class="highlight">لایو استریم فوق‌العاده روان</span> و <span class="highlight">تماس‌های تصویری با وضوح کریستالی</span>، پلتفرمی ساخته‌ایم که مرزهای جغرافیایی و محدودیت‌های فنی را از میان برمی‌دارد. هدف ما توانمندسازی شما برای اشتراک‌گذاری لحظات، دانش و همکاری‌ها با بالاترین کیفیت ممکن است.
                 </p>
@@ -483,45 +504,45 @@
                 </p>
             </section>
 
-            <section class="section" id="live-streaming">
-                <h2 class="section-title">لایو استریم با کیفیت بی‌نظیر</h2>
-                <p>
-                    کیفیت استریم شما، اعتبار شماست. ما این را درک می‌کنیم و به همین دلیل، زیرساختی را فراهم کرده‌ایم که <span class="strong">پایداری و وضوح تصویر</span> را در اولویت قرار می‌دهد:
-                </p>
-                <ul>
-                    <li><span class="strong">رزولوشن تا 4K و بالاتر:</span> محتوای خود را با جزئیاتی خیره‌کننده به نمایش بگذارید.</li>
-                    <li><span class="strong">تاخیر بسیار کم (Ultra-Low Latency):</span> تعامل آنی با مخاطبان، بدون وقفه‌های آزاردهنده.</li>
-                    <li><span class="strong">شبکه توزیع محتوای جهانی (CDN):</span> دسترسی سریع و پایدار برای بینندگان شما در هر کجای دنیا.</li>
-                    <li><span class="strong">سازگاری با نرم‌افزارهای محبوب:</span> اتصال آسان به OBS، XSplit و سایر ابزارهای استریمینگ.</li>
-                </ul>
-                <p class="glitch-text" data-text="با RemoteVM، هر پیکسل داستان شما را روایت می‌کند.">
-                    با RemoteVM، هر پیکسل داستان شما را روایت می‌کند.
-                </p>
-            </section>
+                <section class="section" id="live-streaming" aria-labelledby="live-streaming-title">
+                    <h2 class="section-title" id="live-streaming-title">لایو استریم با کیفیت بی‌نظیر</h2>
+                    <p>
+                        کیفیت استریم شما، اعتبار شماست. ما این را درک می‌کنیم و به همین دلیل، زیرساختی را فراهم کرده‌ایم که <span class="strong">پایداری و وضوح تصویر</span> را در اولویت قرار می‌دهد:
+                    </p>
+                    <ul>
+                        <li><span class="strong">رزولوشن تا 4K و بالاتر:</span> محتوای خود را با جزئیاتی خیره‌کننده به نمایش بگذارید.</li>
+                        <li><span class="strong">تاخیر بسیار کم (Ultra-Low Latency):</span> تعامل آنی با مخاطبان، بدون وقفه‌های آزاردهنده.</li>
+                        <li><span class="strong">شبکه توزیع محتوای جهانی (CDN):</span> دسترسی سریع و پایدار برای بینندگان شما در هر کجای دنیا.</li>
+                        <li><span class="strong">سازگاری با نرم‌افزارهای محبوب:</span> اتصال آسان به OBS، XSplit و سایر ابزارهای استریمینگ.</li>
+                    </ul>
+                    <p class="glitch-text" data-text="با RemoteVM، هر پیکسل داستان شما را روایت می‌کند.">
+                        با RemoteVM، هر پیکسل داستان شما را روایت می‌کند.
+                    </p>
+                </section>
 
-            <section class="section" id="video-calls">
-                <h2 class="section-title">تماس‌های تصویری شفاف و امن</h2>
+            <section class="section" id="video-calls" aria-labelledby="video-calls-title">
+                <h2 class="section-title" id="video-calls-title">تماس‌های تصویری شفاف و امن</h2>
                 <p>
                     ارتباط چهره به چهره، حتی از راه دور. پلتفرم تماس تصویری ما برای جلسات کاری، آموزش آنلاین، و ارتباطات شخصی بهینه‌سازی شده است:
                 </p>
                 <div class="info-card-grid">
                     <div class="info-card">
                         <h3 class="card-title">
-                            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
                             وضوح HD و صدای شفاف
                         </h3>
                         <p class="card-text">تجربه دیداری و شنیداری بی‌نقص، گویی در یک اتاق هستید.</p>
                     </div>
                     <div class="info-card">
                         <h3 class="card-title">
-                            <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
                             امنیت و حریم خصوصی
                         </h3>
                         <p class="card-text">رمزنگاری سرتاسری برای حفاظت از مکالمات شما.</p>
                     </div>
                     <div class="info-card">
                         <h3 class="card-title">
-                            <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h2v2H6zm0 4h2v2H6zm4-4h8v2h-8zm0 4h8v2h-8z"/></svg>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h2v2H6zm0 4h2v2H6zm4-4h8v2h-8zm0 4h8v2h-8z"/></svg>
                             ابزارهای همکاری
                         </h3>
                         <p class="card-text">اشتراک‌گذاری صفحه، چت متنی، و ابزارهای همکاری گروهی.</p>
@@ -529,61 +550,60 @@
                 </div>
             </section>
             
-            <section class="section" id="getting-started">
-                <h2 class="section-title">شروع به کار در چند دقیقه</h2>
-                <p>پیوستن به جامعه RemoteVM و استفاده از خدمات ما آسان است:</p>
-                <ol style="padding-right: 0;">
-                    <li style="margin-bottom:10px; padding-right:25px;">
-                        <strong class="highlight">وارد سایت RemoteVm بشید:</strong> Live.Remotevm.ir
-                    </li>
-                    <li style="margin-bottom:10px; padding-right:25px;">
-                        <strong class="highlight">پلن خود را انتخاب کنید:</strong> از میان پلن‌های متنوع، گزینه‌ای را که با نیازهای شما همخوانی دارد، انتخاب نمایید.
-                    </li>
-                    <li style="margin-bottom:10px; padding-right:25px;">
-                        <strong class="highlight">پیکربندی و اتصال:</strong> تنظیمات اولیه را انجام دهید و اولین استریم یا تماس خود را برقرار کنید!
-                    </li>
-                </ol>
-                <p>برای راهنمایی‌های جامع‌تر، به بخش <a href="https://remotevm.ir/docs" class="highlight">مستندات فنی</a> ما مراجعه کنید.</p>
-            </section>
+                <section class="section" id="getting-started" aria-labelledby="getting-started-title">
+                    <h2 class="section-title" id="getting-started-title">شروع به کار در چند دقیقه</h2>
+                    <p>پیوستن به جامعه RemoteVM و استفاده از خدمات ما آسان است:</p>
+                    <ol style="padding-inline-start: 0;">
+                        <li style="margin-bottom:10px; padding-inline-start:25px;">
+                            <strong class="highlight">وارد سایت RemoteVM بشید:</strong> <a href="/live" class="custom-link">Live.RemoteVM.ir</a>
+                        </li>
+                        <li style="margin-bottom:10px; padding-inline-start:25px;">
+                            <strong class="highlight">پلن خود را انتخاب کنید:</strong> از میان پلن‌های متنوع، گزینه‌ای را که با نیازهای شما همخوانی دارد، انتخاب نمایید.
+                        </li>
+                        <li style="margin-bottom:10px; padding-inline-start:25px;">
+                            <strong class="highlight">پیکربندی و اتصال:</strong> تنظیمات اولیه را انجام دهید و اولین استریم یا تماس خود را برقرار کنید!
+                        </li>
+                    </ol>
+                    <p>برای راهنمایی‌های جامع‌تر، به بخش <a href="/docs" class="highlight">مستندات فنی</a> ما مراجعه کنید.</p>
+                </section>
 
             <div class="cta-button-container">
-                <a href="https://live.remotevm.ir" class="cta-button">اکنون به RemoteVM بپیوندید</a>
+                <a href="/live" class="cta-button">اکنون به RemoteVM بپیوندید</a>
             </div>
         </main>
 
         <footer class="footer-text">
-            <p>© ۱۴۰۲ - ۱۴۰۳ تمامی حقوق برای <a href="https://remotevm.ir" class="glitch-text" data-text="RemoteVM.ir">RemoteVM.ir</a> محفوظ است.</p>
+            <p>© ۱۴۰۲ - ۱۴۰۳ تمامی حقوق برای <a href="/" class="glitch-text" data-text="RemoteVM.ir">RemoteVM.ir</a> محفوظ است.</p>
         </footer>
     </div>
     <script>
-        // Typing animation for main title
-        const mainTitleElement = document.querySelector('.main-title');
-        const originalTitleText = mainTitleElement.dataset.text || 'RemoteVM';
-        mainTitleElement.textContent = '';
-        let charIndex = 0;
-
-        function typeMainTitle() {
-            if (charIndex < originalTitleText.length) {
-                mainTitleElement.textContent += originalTitleText.charAt(charIndex);
-                charIndex++;
-                setTimeout(typeMainTitle, 100);
-            }
-        }
-        setTimeout(typeMainTitle, 1200);
-
         // Optimize glitch animations with IntersectionObserver
-        const glitchElements = document.querySelectorAll('.glitch-text');
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                } else {
-                    entry.target.classList.remove('visible');
-                }
+                entry.target.classList.toggle('visible', entry.isIntersecting);
             });
         }, { threshold: 0.1 });
 
-        glitchElements.forEach(element => observer.observe(element));
+        // Observe background effects and glitch text
+        const animatedElements = document.querySelectorAll('.background-grid, .scanline-overlay, .glitch-text');
+        animatedElements.forEach(element => observer.observe(element));
+
+        // Typing animation for main title with progressive enhancement
+        const mainTitleElement = document.querySelector('.main-title');
+        if (mainTitleElement) {
+            const originalTitleText = mainTitleElement.dataset.text || mainTitleElement.textContent;
+            mainTitleElement.textContent = '';
+            let charIndex = 0;
+
+            function typeMainTitle() {
+                if (charIndex < originalTitleText.length) {
+                    mainTitleElement.textContent += originalTitleText.charAt(charIndex);
+                    charIndex++;
+                    requestAnimationFrame(() => setTimeout(typeMainTitle, 100));
+                }
+            }
+            setTimeout(typeMainTitle, 1200);
+        }
     </script>
 </body>
 </html>
