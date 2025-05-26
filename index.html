@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RemoteVM - پلتفرم پیشرفته لایو استریم و تماس تصویری</title>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #00e1ff; /* آبی سایبری روشن‌تر */
+            --secondary-color: #ff00e1; /* صورتی/بنفش نئونی */
+            --accent-color: #00ff8c; /* سبز نئونی برای تاکید */
+            --background-dark: #05080f; /* پس زمینه بسیار تیره */
+            --container-background: rgba(8, 12, 22, 0.92);
+            --card-background: rgba(12, 18, 30, 0.9);
+            --text-color: #b0c4de; /* آبی-خاکستری روشن */
+            --text-highlight: #ffffff;
+            --text-muted: #7a8baa;
+            --font-family: 'Vazirmatn', sans-serif;
+            --glitch-color-1: var(--primary-color);
+            --glitch-color-2: var(--secondary-color);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            min-height: 100%;
+            font-family: var(--font-family);
+            background-color: var(--background-dark);
+            color: var(--text-color);
+            line-height: 1.7;
+            overflow-x: hidden; 
+        }
+
+        .page-wrapper {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+        
+        /* ------------- Background Effects ------------- */
+        .background-effects {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none; /* اجازه کلیک از روی آن */
+        }
+
+        .background-grid {
+            background-image:
+                linear-gradient(rgba(var(--primary-color-rgb, 0, 225, 255), 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(var(--primary-color-rgb, 0, 225, 255), 0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: moveGridBg 20s linear infinite;
+            opacity: 0.5;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+        }
+        @keyframes moveGridBg {
+            0% { background-position: 0 0; }
+            100% { background-position: 80px 80px; }
+        }
+
+        .scanline-overlay { /* افکت خطوط اسکن تلویزیون‌های قدیمی */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                transparent 50%,
+                rgba(0,0,0,0.15) 50%
+            );
+            background-size: 100% 4px;
+            animation: scanlineAnim 15s linear infinite;
+            opacity: 0.5;
+        }
+        @keyframes scanlineAnim {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 100px; }
+        }
+        /* ------------- End Background Effects ------------- */
+
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 50px;
+            z-index: 2;
+            position: relative;
+        }
+
+        .logo-core {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--text-highlight);
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px var(--primary-color), 0 0 22px var(--primary-color), 0 0 5px var(--secondary-color);
+            display: inline-block;
+            animation: logoGlitch 5s infinite alternate, subtlePulse 3s infinite ease-in-out;
+
+
+position: relative; /* برای شبه المان‌های گلیچ */
+        }
+        .logo-core span { color: var(--primary-color); }
+        
+        @keyframes logoGlitch { /* گلیچ ظریف برای لوگو */
+            0%, 100% { transform: skew(0); }
+            49% { transform: skew(0); }
+            50% { transform: skew(0.5deg, -0.2deg); text-shadow: 0 0 12px var(--secondary-color), 2px 2px 0 var(--primary-color), -2px -2px 0 var(--accent-color); }
+            51% { transform: skew(0); }
+        }
+        @keyframes subtlePulse { /* پالس لوگو از قبل */
+            0%, 100% { transform: scale(1) skew(0); } /* اطمینان از عدم تداخل با گلیچ */
+            50% { transform: scale(1.02) skew(0); }
+        }
+
+        .main-title {
+            font-size: 2.4rem;
+            color: var(--text-highlight);
+            margin-bottom: 10px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-shadow: 0 0 8px rgba(var(--primary-color-rgb,0,225,255), 0.7);
+            /* انیمیشن تایپ بعداً با JS اضافه می‌شود اگر بخواهید */
+        }
+
+        .subtitle {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            font-weight: 300;
+            max-width: 600px;
+            margin: 0 auto;
+            text-shadow: 0 0 5px rgba(var(--text-color-rgb, 176,196,222), 0.3);
+        }
+
+        .content-container {
+            z-index: 1; /* بالاتر از گرید، پایین تر از هدر اگر تداخل کند */
+            background: var(--container-background);
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 0 60px rgba(var(--primary-color-rgb,0,225,255), 0.2),
+                        0 0 30px rgba(var(--secondary-color-rgb,255,0,225), 0.15),
+                        inset 0 0 15px rgba(0,0,0,0.3);
+            border: 2px solid;
+            border-image-slice: 1;
+            border-width: 2px;
+            border-image-source: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            max-width: 950px;
+            width: 100%;
+            opacity: 0;
+            transform: translateY(40px);
+            animation: contentAppear 1s 0.5s cubic-bezier(0.215, 0.610, 0.355, 1) forwards;
+        }
+        
+        @keyframes contentAppear {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section {
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: sectionFadeIn 0.8s ease-out forwards;
+        }
+        .section:nth-child(1) { animation-delay: 0.8s; }
+        .section:nth-child(2) { animation-delay: 1s; }
+        .section:nth-child(3) { animation-delay: 1.2s; }
+        .section:nth-child(4) { animation-delay: 1.4s; }
+        .section:last-child { margin-bottom: 0; }
+
+        @keyframes sectionFadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+
+        .section-title {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            position: relative; /* برای خط زیرین متحرک */
+            display: inline-block;
+            font-weight: 500;
+            text-shadow: 0 0 6px var(--primary-color);
+        }
+        .section-title::after { /* خط زیرین متحرک */
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            animation: अधिकारियों 1.5s 1.5s ease-out forwards; /* titleUnderline an animate name */
+        }
+        @keyframes titleUnderline { /* اسم انیمیشن را اصلاح کردم */
+             to { width: 100%; }
+        }
+
+
+        .section p, .section ul {
+            font-size: 1.05rem;
+            color: var(--text-color);
+            margin-bottom: 18px;
+        }
+
+        .section ul {
+            list-style: none;
+            padding-right: 0;
+        }
+
+
+.section ul li {
+            margin-bottom: 12px;
+            position: relative;
+            padding-right: 30px;
+            display: flex; /* برای همراستایی آیکون و متن */
+            align-items: center;
+        }
+
+        .section ul li::before { /* آیکون سفارشی با افکت */
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 10px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-color);
+            animation: pulseIcon 2s infinite ease-in-out;
+        }
+        @keyframes pulseIcon {
+            0%, 100% { transform: translateY(-50%) scale(1); opacity: 1; }
+            50% { transform: translateY(-50%) scale(1.3); opacity: 0.7; }
+        }
+        
+        .highlight {
+            color: var(--accent-color); /* استفاده از رنگ تاکیدی */
+            font-weight: 500;
+            text-shadow: 0 0 5px var(--accent-color);
+        }
+        .strong {
+            font-weight: 700;
+            color: var(--text-highlight);
+        }
+
+        .info-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 25px;
+        }
+
+        .info-card {
+            background-color: var(--card-background);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(var(--primary-color-rgb,0,225,255), 0.2);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25), inset 0 0 8px rgba(var(--primary-color-rgb,0,225,255), 0.1);
+            transition: transform 0.35s cubic-bezier(0.215, 0.610, 0.355, 1), box-shadow 0.35s cubic-bezier(0.215, 0.610, 0.355, 1);
+        }
+        .info-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 10px 30px rgba(var(--primary-color-rgb,0,225,255), 0.2), 
+                        inset 0 0 12px rgba(var(--primary-color-rgb,0,225,255), 0.15);
+            border-color: rgba(var(--primary-color-rgb,0,225,255), 0.4);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+        }
+        .card-title svg {
+            width: 22px;
+            height: 22px;
+            margin-left: 10px;
+            fill: var(--primary-color);
+            transition: transform 0.3s ease;
+        }
+        .info-card:hover .card-title svg {
+            transform: rotate(15deg) scale(1.1);
+        }
+        .card-text {
+            font-size: 0.98rem;
+            color: var(--text-muted);
+        }
+
+        .cta-button-container {
+            text-align: center;
+            margin-top: 35px;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(95deg, var(--secondary-color), var(--primary-color));
+            color: var(--text-highlight);
+            padding: 14px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.05rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-position 0.5s ease;
+            box-shadow: 0 5px 18px rgba(var(--primary-color-rgb,0,225,255), 0.35), 0 3px 8px rgba(var(--secondary-color-rgb,255,0,225), 0.2);
+            border: none;
+            cursor: pointer;
+            background-size: 200% 100%;
+            background-position: right bottom;
+        }
+        .cta-button:hover {
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 8px 25px rgba(var(--primary-color-rgb,0,225,255), 0.45), 0 5px 12px rgba(var(--secondary-color-rgb,255,0,225), 0.3);
+
+
+background-position: left bottom;
+        }
+        
+        .footer-text {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            z-index: 2;
+            opacity: 0;
+            animation: sectionFadeIn 1s 2s ease-out forwards; /* با تاخیر زیاد ظاهر شود */
+        }
+        .footer-text a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: text-shadow 0.3s ease;
+        }
+        .footer-text a:hover {
+            text-decoration: none;
+            text-shadow: 0 0 5px var(--primary-color);
+        }
+
+        /* Glitch effect for general text (use with a class) */
+        .glitch-text {
+            position: relative;
+            animation: textGlitch 3s infinite steps(1);
+        }
+        .glitch-text::before,
+        .glitch-text::after {
+            content: attr(data-text); /* Needs data-text attribute on the element */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--background-dark); /* Match body background */
+            overflow: hidden;
+        }
+        .glitch-text::before {
+            left: 2px;
+            text-shadow: -1px 0 var(--glitch-color-1);
+            animation: noise-anim-1 2s infinite linear alternate-reverse;
+        }
+        .glitch-text::after {
+            left: -2px;
+            text-shadow: -1px 0 var(--glitch-color-2), 1px 1px var(--glitch-color-1);
+            animation: noise-anim-2 3s infinite linear alternate-reverse;
+        }
+        @keyframes noise-anim-1 { /* For glitch-text */
+            0% { clip-path: inset(30% 0 60% 0); } 20% { clip-path: inset(90% 0 1% 0); }
+            40% { clip-path: inset(50% 0 10% 0); } 60% { clip-path: inset(10% 0 70% 0); }
+            80% { clip-path: inset(70% 0 5% 0); } 100% { clip-path: inset(40% 0 45% 0); }
+        }
+        @keyframes noise-anim-2 { /* For glitch-text */
+            0% { clip-path: inset(80% 0 5% 0); } 20% { clip-path: inset(20% 0 75% 0); }
+            40% { clip-path: inset(40% 0 30% 0); } 60% { clip-path: inset(90% 0 2% 0); }
+            80% { clip-path: inset(10% 0 85% 0); } 100% { clip-path: inset(60% 0 20% 0); }
+        }
+
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .page-wrapper { padding: 30px 15px; }
+            .logo-core { font-size: 3.2rem; }
+            .main-title { font-size: 2rem; }
+            .subtitle { font-size: 1rem; }
+            .content-container { padding: 25px; }
+            .section-title { font-size: 1.6rem; }
+            .section p, .section ul { font-size: 1rem; }
+            .info-card-grid { grid-template-columns: 1fr; }
+        }
+         @media (max-width: 480px) {
+            .logo-core { font-size: 2.8rem; }
+            .main-title { font-size: 1.7rem; }
+            .section-title { font-size: 1.4rem; }
+            .card-title { font-size: 1.15rem; }
+         }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <div class="background-effects">
+            <div class="background-grid"></div>
+            <div class="scanline-overlay"></div>
+        </div>
+
+        <header class="header-section">
+            <div class="logo-core">
+                <span>R</span>VM
+            </div>
+            <h1 class="main-title" data-text="به RemoteVM خوش آمدید">RemoteVM</h1> <!-- data-text for potential JS typing or glitch -->
+            <p class="subtitle">پلتفرم نهایی شما برای لایو استریم با کیفیت سینمایی و تماس‌های تصویری بدون مرز</p>
+        </header>
+
+        <main class="content-container">
+            <section class="section" id="about-platform">
+                <h2 class="section-title">درباره پلتفرم RemoteVM</h2>
+                <p>
+                    در <span class="strong">RemoteVM</span>، ما آینده ارتباطات دیجیتال را بازتعریف می‌کنیم. با تمرکز بر ارائه <span class="highlight">لایو استریم فوق‌العاده روان</span> و <span class="highlight">تماس‌های تصویری با وضوح کریستالی</span>، پلتفرمی ساخته‌ایم که مرزهای جغرافیایی و محدودیت‌های فنی را از میان برمی‌دارد. هدف ما توانمندسازی شما برای اشتراک‌گذاری لحظات، دانش و همکاری‌ها با بالاترین کیفیت ممکن است.
+                </p>
+                <p>
+                    چه یک استریمر حرفه‌ای باشید، چه به دنبال برگزاری وبینارهای تعاملی، یا صرفاً خواهان ارتباطی بی‌نقص با عزیزانتان، RemoteVM ابزارهای لازم را در اختیار شما قرار می‌دهد.
+                </p>
+            </section>
+
+            <section class="section" id="live-streaming">
+                <h2 class="section-title">لایو استریم با کیفیت بی‌نظیر</h2>
+                <p>
+                    کیفیت استریم شما، اعتبار شماست. ما این را درک می‌کنیم و به همین دلیل، زیرساختی را فراهم کرده‌ایم که <span class="strong">پایداری و وضوح تصویر</span> را در اولویت قرار می‌دهد:
+                </p>
+                <ul>
+                    <li><span class="strong">رزولوشن تا 4K و بالاتر:</span> محتوای خود را با جزئیاتی خیره‌کننده به نمایش بگذارید.</li>
+                    <li><span class="strong">تاخیر بسیار کم (Ultra-Low Latency):</span> تعامل آنی با مخاطبان، بدون وقفه‌های آزاردهنده.</li>
+                    <li><span class="strong">شبکه توزیع محتوای جهانی (CDN):</span> دسترسی سریع و پایدار برای بینندگان شما در هر کجای دنیا.</li>
+                    <li><span class="strong">سازگاری با نرم‌افزارهای محبوب:</span> اتصال آسان به OBS، XSplit و سایر ابزارهای استریمینگ.</li>
+                </ul>
+                <p class="glitch-text" data-text="با RemoteVM، هر پیکسل داستان شما را روایت می‌کند.">
+                    با RemoteVM، هر پیکسل داستان شما را روایت می‌کند.
+                </p>
+            </section>
+
+            <section class="section" id="video-calls">
+                <h2 class="section-title">تماس‌های تصویری شفاف و امن</h2>
+                <p>
+                    ارتباط چهره به چهره، حتی از راه دور. پلتفرم تماس تصویری ما برای جلسات کاری، آموزش آنلاین، و ارتباطات شخصی بهینه‌سازی شده است:
+                </p>
+                <div class="info-card-grid">
+                    <div class="info-card">
+                        <h3 class="card-title">
+                            <!-- SVG Icon for Clarity -->
+                            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                            وضوح HD و صدای شفاف
+                        </h3>
+                        <p class="card-text">تجربه دیداری و شنیداری بی‌نقص، گویی در یک اتاق هستید.</p>
+                    </div>
+                    <div class="info-card">
+                        <h3 class="card-title">
+                             <!-- SVG Icon for Security -->
+                            <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+                            امنیت و حریم خصوصی
+                        </h3>
+                        <p class="card-text">رمزنگاری سرتاسری برای حفاظت از مکالمات شما.</p>
+                    </div>
+                    <div class="info-card">
+                        <h3 class="card-title">
+                            <!-- SVG Icon for Features -->
+                           <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h2v2H6zm0 4h2v2H6zm4-4h8v2h-8zm0 4h8v2h-8z"/></svg>
+
+                        </h3>
+                        <p class="card-text">اشتراک‌گذاری صفحه، چت متنی، و ابزارهای همکاری گروهی.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="section" id="getting-started">
+                 <h2 class="section-title">شروع به کار در چند دقیقه</h2>
+                 <p>پیوستن به جامعه RemoteVM و استفاده از خدمات ما آسان است:</p>
+                 <ol style="list-style-type: none; padding-right: 0;">
+                    <li style="margin-bottom:10px; padding-right:25px; position:relative;">
+                        <span style="position:absolute; right:0; color:var(--accent-color); font-weight:bold;">۱.</span>
+                        <strong class="highlight">ثبت‌نام کنید:</strong> یک حساب کاربری رایگان ایجاد کنید.
+                    </li>
+                    <li style="margin-bottom:10px; padding-right:25px; position:relative;">
+                         <span style="position:absolute; right:0; color:var(--accent-color); font-weight:bold;">۲.</span>
+                        <strong class="highlight">پلن خود را انتخاب کنید:</strong> از میان پلن‌های متنوع، گزینه‌ای را که با نیازهای شما همخوانی دارد، انتخاب نمایید.
+                    </li>
+                    <li style="margin-bottom:10px; padding-right:25px; position:relative;">
+                        <span style="position:absolute; right:0; color:var(--accent-color); font-weight:bold;">۳.</span>
+                        <strong class="highlight">پیکربندی و اتصال:</strong> تنظیمات اولیه را انجام دهید و اولین استریم یا تماس خود را برقرار کنید!
+                    </li>
+                 </ol>
+                 <p>برای راهنمایی‌های جامع‌تر، به بخش <a href="/docs" class="highlight">مستندات فنی</a> ما مراجعه کنید.</p>
+            </section>
+
+            <div class="cta-button-container">
+                <a href="/register" class="cta-button">اکنون به RemoteVM بپیوندید</a>
+            </div>
+
+        </main>
+
+        <footer class="footer-text">
+            <p>© ۱۴۰۲ - ۱۴۰۳ تمامی حقوق برای <a href="https://remotevm.ir" class="glitch-text" data-text="RemoteVM.ir">RemoteVM.ir</a> محفوظ است.</p>
+        </footer>
+
+    </div>
+    <script>
+        // Optional: JavaScript for more advanced typing animations or interactions
+        // Example: Basic typing effect for main title (can be enhanced)
+        const mainTitleElement = document.querySelector('.main-title');
+        const originalTitleText = mainTitleElement.dataset.text || mainTitleElement.textContent;
+        mainTitleElement.textContent = ''; // Clear initial text
+        let charIndex = 0;
+
+        function typeMainTitle() {
+            if (charIndex < originalTitleText.length) {
+                mainTitleElement.textContent += originalTitleText.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeMainTitle, 100); // Adjust typing speed (milliseconds)
+            }
+        }
+        // Start typing animation after a delay (e.g., after logo animation)
+        setTimeout(typeMainTitle, 1200); // Delay start of typing
+
+
+        // Add data-text attribute dynamically for glitch effect on elements
+        // document.querySelectorAll('.glitch-text').forEach(el => {
+        //     el.setAttribute('data-text', el.textContent);
+        // });
+    </script>
+</body>
+</html>
