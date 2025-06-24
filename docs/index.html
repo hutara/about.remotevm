@@ -1,0 +1,390 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="مستندات فنی Live.RemoteVM - راهنمای جامع برای ساخت لینک‌های سفارشی و استفاده از پارامترها برای لایو استریم و تماس تصویری.">
+    <meta name="keywords" content="مستندات, پارامتر URL, لایو استریم, تماس تصویری, Live.RemoteVM, راهنما, لینک‌سازی, WebRTC">
+    <meta name="author" content="RemoteVM Team">
+    <title>مستندات فنی - Live.RemoteVM</title>
+    <link rel="icon" type="image/png" href="../favicon.png">
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #00e1ff;
+            --primary-color-rgb: 0, 225, 255;
+            --secondary-color: #ff00e1;
+            --secondary-color-rgb: 255, 0, 225;
+            --accent-color: #00ff8c;
+            --accent-color-rgb: 0, 255, 140;
+            --background-dark: #05080f;
+            --container-background: rgba(8, 12, 22, 0.92);
+            --card-background: rgba(12, 18, 30, 0.9);
+            --text-color: #b0c4de;
+            --text-color-rgb: 176, 196, 222;
+            --text-highlight: #ffffff;
+            --text-muted: #a0b0cc;
+            --font-family: 'Vazirmatn', 'Arial', sans-serif;
+            --font-family-code: 'Fira Code', 'monospace';
+            --border-color: rgba(var(--primary-color-rgb), 0.2);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+
+        body, html {
+            min-height: 100vh; font-family: var(--font-family); background-color: var(--background-dark);
+            color: var(--text-color); line-height: 1.8; overflow-x: hidden;
+        }
+        
+        body, button, input, select, label, h2, h3, h4, span, div, p, a, li, th, td {
+            font-family: 'Vazirmatn', sans-serif !important;
+        }
+
+        .page-wrapper {
+            position: relative; width: 100%; min-height: 100vh; display: flex; flex-direction: column;
+            align-items: center; padding: 40px 20px;
+        }
+
+        .background-effects {
+            position: fixed; top: 0; inset-inline-start: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;
+        }
+        .background-grid {
+            background-image: linear-gradient(rgba(var(--primary-color-rgb), 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(var(--primary-color-rgb), 0.04) 1px, transparent 1px);
+            background-size: 40px 40px; animation: moveGridBg 20s linear infinite; opacity: 0.5; width: 100%; height: 100%; position: absolute;
+        }
+        @keyframes moveGridBg { 0% { background-position: 0 0; } 100% { background-position: 80px 80px; } }
+        
+        .header-section { text-align: center; margin-bottom: 40px; z-index: 2; }
+        .logo-core {
+            font-size: 3rem; font-weight: 700; color: var(--text-highlight);
+            text-shadow: 0 0 10px var(--primary-color), 0 0 22px var(--primary-color); display: inline-block;
+        }
+        .logo-core span { color: var(--primary-color); }
+        .main-title {
+            font-size: 2rem; color: var(--text-highlight); text-shadow: 0 0 8px rgba(var(--primary-color-rgb), 0.7);
+        }
+
+        .docs-layout {
+            display: flex; flex-direction: row; gap: 30px; width: 100%; max-width: 1300px; z-index: 1;
+        }
+
+        .docs-nav {
+            flex: 0 0 240px; position: sticky; top: 40px; height: calc(100vh - 80px); align-self: flex-start;
+        }
+        .docs-nav-inner {
+            background: var(--card-background); backdrop-filter: blur(5px); border: 1px solid var(--border-color);
+            border-radius: 12px; padding: 20px;
+        }
+        .docs-nav ul { list-style: none; padding: 0; }
+        .docs-nav li a {
+            display: block; padding: 10px 15px; text-decoration: none; color: var(--text-muted); font-size: 0.95rem;
+            border-radius: 6px; transition: all 0.2s ease-in-out; position: relative; border-right: 3px solid transparent;
+        }
+        .docs-nav li a:hover {
+            background-color: rgba(var(--primary-color-rgb), 0.1); color: var(--text-highlight); transform: translateX(-5px);
+        }
+        .docs-nav li a.active {
+            color: var(--primary-color); font-weight: 700; background-color: rgba(var(--primary-color-rgb), 0.15);
+            border-right-color: var(--primary-color);
+        }
+
+        .content-container {
+            flex-grow: 1; background: var(--container-background); padding: 35px; border-radius: 20px;
+            box-shadow: 0 0 60px rgba(var(--primary-color-rgb), 0.1), 0 0 30px rgba(var(--secondary-color-rgb), 0.05);
+            border: 2px solid; border-image-slice: 1; border-image-source: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
+        }
+        .section { margin-bottom: 50px; scroll-margin-top: 40px; }
+        .section:last-child { margin-bottom: 0; }
+        .section-title {
+            font-size: 1.8rem; color: var(--primary-color); margin-bottom: 20px; padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color); text-shadow: 0 0 6px var(--primary-color);
+        }
+        .section p, .section ul { font-size: 1.05rem; margin-bottom: 18px; }
+        .section ul { list-style-type: none; padding-right: 20px; }
+        .section ul li { margin-bottom: 10px; position: relative; }
+        .section ul li::before {
+            content: '›'; position: absolute; right: -20px; top: 0; color: var(--accent-color); font-weight: 700;
+        }
+        .highlight { color: var(--accent-color); font-weight: 500; font-family: var(--font-family-code) !important; padding: 2px 4px; background-color: rgba(var(--accent-color-rgb), 0.1); border-radius: 4px; }
+        .strong { font-weight: 700; color: var(--text-highlight); }
+
+        .code-block {
+            background-color: rgba(0, 0, 0, 0.5); border: 1px solid var(--border-color);
+            border-radius: 8px; margin: 25px 0; position: relative; overflow: hidden;
+        }
+        .code-block pre { margin: 0; padding: 20px; overflow-x: auto; }
+        .code-block code { font-family: var(--font-family-code) !important; color: #e0e0e0; font-size: 0.9rem; line-height: 1.6; }
+        .copy-btn {
+            position: absolute; top: 12px; left: 12px; background: rgba(var(--primary-color-rgb), 0.15);
+            color: var(--primary-color); border: 1px solid var(--primary-color); padding: 6px 12px;
+            border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; z-index: 10;
+        }
+        .copy-btn:hover { background: var(--primary-color); color: var(--background-dark); }
+        
+        .param-table-wrapper { overflow-x: auto; }
+        .param-table {
+            width: 100%; border-collapse: collapse; margin: 25px 0;
+        }
+        .param-table th, .param-table td {
+            padding: 12px 15px; border: 1px solid var(--border-color); text-align: right;
+        }
+        .param-table thead { background-color: rgba(var(--primary-color-rgb), 0.1); }
+        .param-table th { color: var(--primary-color); font-weight: 700; }
+        
+        .cta-button {
+            display: inline-block; background: linear-gradient(95deg, var(--secondary-color), var(--primary-color));
+            color: var(--text-highlight); padding: 14px 30px; border-radius: 10px; text-decoration: none; font-weight: 500;
+            font-size: 1.05rem; transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 18px rgba(var(--primary-color-rgb), 0.35); border: none; cursor: pointer;
+        }
+        .cta-button:hover { transform: translateY(-4px) scale(1.03); }
+
+        .footer-text { margin-top: 50px; text-align: center; font-size: 0.9rem; color: var(--text-muted); z-index: 2; }
+        .footer-text a { color: var(--primary-color); text-decoration: none; }
+
+        @media (max-width: 992px) {
+            .page-wrapper { padding: 20px 15px; }
+            .docs-layout { flex-direction: column; }
+            .docs-nav {
+                position: static; height: auto; width: 100%; margin-bottom: 30px;
+            }
+            .docs-nav-inner {
+                padding: 10px; display: flex; overflow-x: auto;
+            }
+            .docs-nav ul {
+                display: flex; gap: 5px; width: 100%;
+            }
+            .docs-nav li { flex-shrink: 0; }
+            .docs-nav li a {
+                border-right: none; border-bottom: 3px solid transparent; padding: 8px 12px;
+            }
+            .docs-nav li a:hover { transform: none; }
+            .docs-nav li a.active { border-bottom-color: var(--primary-color); }
+        }
+        @media (max-width: 480px) {
+            .page-wrapper { padding: 20px 10px; }
+            .content-container { padding: 20px; }
+            .section-title { font-size: 1.6rem; }
+            .main-title { font-size: 1.8rem; }
+            .param-table th, .param-table td { padding: 8px 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <div class="background-effects"><div class="background-grid"></div></div>
+
+        <header class="header-section">
+            <a href="/" style="text-decoration: none;">
+                <div class="logo-core"><span>R</span>VM</div>
+            </a>
+            <h1 class="main-title">مستندات فنی Live.RemoteVM</h1>
+        </header>
+
+        <div class="docs-layout">
+            <aside class="docs-nav">
+                <nav class="docs-nav-inner">
+                    <ul>
+                        <li><a href="#introduction" class="active">مقدمه</a></li>
+                        <li><a href="#basic-links">ساخت لینک پایه</a></li>
+                        <li><a href="#link-generator">مولد لینک</a></li>
+                        <li><a href="#parameters">جدول پارامترها</a></li>
+                        <li><a href="#use-cases">مثال‌های کاربردی</a></li>
+                        <li><a href="#faq">سوالات متداول</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <main class="content-container">
+                <section class="section" id="introduction">
+                    <h2 class="section-title">مقدمه: قدرت در دستان شماست</h2>
+                    <p>
+                        به مستندات <span class="strong">Live.RemoteVM</span> خوش آمدید. این پلتفرم بر پایه تکنولوژی <span class="strong">WebRTC</span> ساخته شده و برای ارائه نهایت انعطاف‌پذیری در لایو استریم و تماس‌های تصویری طراحی شده است. قدرت اصلی این سرویس در <span class="highlight">لینک‌های قابل تنظیم</span> آن نهفته است. شما می‌توانید با افزودن پارامترهای مختلف به URL، رفتار، کیفیت و امنیت هر استریم را بدون نیاز به هیچ نرم‌افزار یا پنل پیچیده‌ای کنترل کنید.
+                    </p>
+                </section>
+
+                <section class="section" id="basic-links">
+                    <h2 class="section-title">ساخت لینک پایه</h2>
+                    <p>
+                        اساسی‌ترین مفهوم، ایجاد یک <span class="strong">اتاق (Room)</span> مجازی است. هر اتاق یک نام منحصر به فرد دارد که توسط شما تعیین می‌شود.
+                    </p>
+                    <h4>۱. لینک ارسال (Push/Host)</h4>
+                    <p>برای ارسال تصویر از دوربین/دسکتاپ به یک اتاق، لینک زیر را با نام اتاق دلخواه خود باز کنید:</p>
+                    <div class="code-block">
+                        <pre><code>https://live.remotevm.ir/?room=MyAwesomeStream</code></pre>
+                        <button class="copy-btn">کپی</button>
+                    </div>
+
+                    <h4>۲. لینک دریافت (View)</h4>
+                    <p>برای اینکه دیگران استریم شما را ببینند، از پارامتر <span class="highlight">&view</span> استفاده کنید:</p>
+                    <div class="code-block">
+                        <pre><code>https://live.remotevm.ir/?view=MyAwesomeStream</code></pre>
+                        <button class="copy-btn">کپی</button>
+                    </div>
+                </section>
+                
+                <section class="section" id="link-generator">
+                    <h2 class="section-title">مولد لینک (Link Generator)</h2>
+                    <p>
+                        به خاطر سپردن تمام پارامترها دشوار است. برای راحتی شما، ما یک <span class="strong">مولد لینک</span> قدرتمند ساخته‌ایم که به شما اجازه می‌دهد با چند کلیک، لینک‌های پیچیده و سفارشی خود را بسازید.
+                    </p>
+                    <p>به شدت توصیه می‌کنیم از این ابزار برای شروع استفاده کنید:</p>
+                    <div style="text-align: center; margin-top: 20px;">
+                        <a href="https://linkgen.remotevm.ir/" target="_blank" class="cta-button">باز کردن مولد لینک</a>
+                    </div>
+                </section>
+
+                <section class="section" id="parameters">
+                    <h2 class="section-title">جدول کامل پارامترها</h2>
+                    <p>در جدول زیر، لیست کاملی از پارامترهای پرکاربرد را مشاهده می‌کنید.</p>
+                    <div class="param-table-wrapper">
+                        <table class="param-table">
+                            <thead>
+                                <tr>
+                                    <th>پارامتر</th>
+                                    <th>توضیحات</th>
+                                    <th>مثال</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code class="highlight">room</code></td>
+                                    <td>نام اتاق مجازی شما. (اجباری)</td>
+                                    <td><code>&room=MyMeeting</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code class="highlight">view</code></td>
+                                    <td>برای ساخت لینک مشاهده (بدون ارسال تصویر).</td>
+                                    <td><code>&view=MyMeeting</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code class="highlight">password</code></td>
+                                    <td>برای اتاق رمز عبور تعیین می‌کند.</td>
+                                    <td><code>&password=Secure123</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code class="highlight">host</code></td>
+                                    <td>به کاربر کنترل‌های مدیریتی اتاق را می‌دهد.</td>
+                                    <td><code>&host</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code class="highlight">bitrate</code></td>
+                                    <td>بیت‌ریت ویدئو (kbps). عدد بالاتر = کیفیت بهتر.</td>
+                                    <td><code>&bitrate=4000</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code class="highlight">codec</code></td>
+                                    <td>کدک ویدئو (h264, vp9, av1).</td>
+                                    <td><code>&codec=h264</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code class="highlight">label</code></td>
+                                    <td>یک برچسب برای استریم شما تعیین می‌کند.</td>
+                                    <td><code>&label=Camera1</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code class="highlight">screenshare</code></td>
+                                    <td>به محض ورود، درخواست اشتراک صفحه را نمایش می‌دهد.</td>
+                                    <td><code>&screenshare</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code class="highlight">noaudio</code></td>
+                                    <td>ورودی صدا را به طور کامل غیرفعال می‌کند.</td>
+                                    <td><code>&noaudio</code></td>
+                                </tr>
+                                 <tr>
+                                    <td><code class="highlight">proxy</code></td>
+                                    <td>ترافیک را از سرورهای ما عبور می‌دهد (برای حل مشکل فایروال).</td>
+                                    <td><code>&proxy</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="section" id="use-cases">
+                    <h2 class="section-title">مثال‌های کاربردی</h2>
+                    <h4>۱. اتاق جلسه امن و خصوصی</h4>
+                    <p><strong>لینک برای مدیر (Host):</strong></p>
+                    <div class="code-block"><pre><code>https://live.remotevm.ir/?room=ProjectX&password=s3cr3t&host</code></pre><button class="copy-btn">کپی</button></div>
+                    <p><strong>لینک برای دعوت مهمانان:</strong></p>
+                    <div class="code-block"><pre><code>https://live.remotevm.ir/?room=ProjectX&password=s3cr3t</code></pre><button class="copy-btn">کپی</button></div>
+
+                    <h4>۲. استودیوی پخش مجازی (مانند OBS در مرورگر)</h4>
+                    <p>در این سناریو، یک کارگردان (شما) دو مهمان را مدیریت کرده و بین آن‌ها سوییچ می‌کند.</p>
+                    <p><strong>لینک کارگردان (شما):</strong></p>
+                    <div class="code-block"><pre><code>https://live.remotevm.ir/?room=LiveShow&host</code></pre><button class="copy-btn">کپی</button></div>
+                    <p><strong>لینک مهمان اول (با برچسب):</strong></p>
+                    <div class="code-block"><pre><code>https://live.remotevm.ir/?room=LiveShow&label=Guest1</code></pre><button class="copy-btn">کپی</button></div>
+                    <p><strong>لینک مهمان دوم (با برچسب):</strong></p>
+                    <div class="code-block"><pre><code>https://live.remotevm.ir/?room=LiveShow&label=Guest2</code></pre><button class="copy-btn">کپی</button></div>
+                    <p><strong>لینک پخش نهایی (برای بینندگان):</strong> (کارگردان در پنل خود با استفاده از قابلیت Solo، انتخاب می‌کند که کدام مهمان نمایش داده شود)</p>
+                     <div class="code-block"><pre><code>https://live.remotevm.ir/?view=LiveShow</code></pre><button class="copy-btn">کپی</button></div>
+                </section>
+                
+                <section class="section" id="faq">
+                    <h2 class="section-title">سوالات متداول</h2>
+                    <p><strong class="strong">امنیت این پلتفرم چگونه است؟</strong></p>
+                    <p>
+                        Live.RemoteVM بر پایه WebRTC کار می‌کند که به صورت پیش‌فرض از رمزنگاری سرتاسری (End-to-End Encryption) با پروتکل‌های DTLS-SRTP پشتیبانی می‌کند. این یعنی در اکثر مواقع (اتصالات Peer-to-Peer)، داده‌های شما مستقیماً بین کاربران رمزنگاری شده و از سرورهای ما عبور نمی‌کند.
+                    </p>
+                    <p><strong class="strong">چرا گاهی تصویر با تاخیر ارسال می‌شود؟</strong></p>
+                    <p>
+                        کیفیت و تاخیر به پایداری اینترنت شما و طرف مقابل بستگی دارد. اگر با مشکل مواجه شدید، بیت‌ریت را با پارامتر <span class="highlight">&bitrate=1000</span> کاهش دهید یا از پارامتر <span class="highlight">&proxy</span> برای مسیریابی ترافیک از طریق سرورهای ما استفاده کنید که می‌تواند به پایداری اتصال کمک کند.
+                    </p>
+                </section>
+            </main>
+        </div>
+
+        <footer class="footer-text">
+            <p>© ۱۴۰۲ - ۱۴۰۳ تمامی حقوق برای <a href="https://remotevm.ir">RemoteVM.ir</a> محفوظ است.</p>
+        </footer>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- Copy Button Functionality ---
+            document.querySelectorAll('.copy-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const pre = button.previousElementSibling;
+                    const codeText = pre.querySelector('code').innerText;
+                    navigator.clipboard.writeText(codeText).then(() => {
+                        const originalText = button.innerText;
+                        button.innerText = 'کپی شد!';
+                        button.style.background = 'var(--accent-color)';
+                        button.style.color = 'var(--background-dark)';
+                        setTimeout(() => {
+                            button.innerText = originalText;
+                            button.style.background = '';
+                            button.style.color = '';
+                        }, 2000);
+                    });
+                });
+            });
+
+            // --- Scroll-Spy for Navigation ---
+            const sections = document.querySelectorAll('.section');
+            const navLinks = document.querySelectorAll('.docs-nav a');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === `#${id}`) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, { rootMargin: '0px 0px -80% 0px' });
+
+            sections.forEach(section => observer.observe(section));
+        });
+    </script>
+</body>
+</html>
